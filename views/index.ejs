@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+  <h3>My Google Maps Demo</h3>
+  <div id="map"></div>
+  <script>
+
+          function initMap() {
+              var uluru = {lat: 37.5483, lng: -121.9886};
+              var map = new google.maps.Map(document.getElementById('map'), {
+                  zoom: 8,
+                  center: uluru
+              });
+
+              var image;
+              var blue = {
+                  url: '/images/blue1.png', // url
+                  scaledSize: new google.maps.Size(50, 50), // scaled size
+                  origin: new google.maps.Point(0,0), // origin
+                  anchor: new google.maps.Point(0, 0) // anchor
+              };
+              var green = {
+                  url: '/images/green.ico', // url
+                  scaledSize: new google.maps.Size(50, 50), // scaled size
+                  origin: new google.maps.Point(0,0), // origin
+                  anchor: new google.maps.Point(0, 0) // anchor
+              };
+              var red = {
+                  url: '/images/red1.png', // url
+                  scaledSize: new google.maps.Size(50, 50), // scaled size
+                  origin: new google.maps.Point(0,0), // origin
+                  anchor: new google.maps.Point(0, 0) // anchor
+              };
+              var white = {
+                  url: '/images/white1.png', // url
+                  scaledSize: new google.maps.Size(50, 50), // scaled size
+                  origin: new google.maps.Point(0,0), // origin
+                  anchor: new google.maps.Point(0, 0) // anchor
+              };
+              $.get( "/locations", function( data ) {
+
+//                  alert( "Data Loaded: " + data.locations.location[0].address );
+                  $.each( data.locations.location, function( key, data ) {
+                      var cityCircle = new google.maps.Circle({
+                          strokeColor: '#FF0000',
+                          strokeOpacity: 0.8,
+                          strokeWeight: 2,
+                          fillColor: '#FF0000',
+                          fillOpacity: 0.35,
+                          map: map,
+                          center: {lat:data.latitude, lng: data.longitude},
+                          radius: data.$revenue/10000
+                      });
+
+                      if(data.type==="RetailLocation")
+                          image=green;
+                      else if(data.type==="HeadQuarters")
+                          image=white;
+                      else if(data.type==="Call Center")
+                          image=blue;
+                      else
+                          image=red;
+                      var infowindow = new google.maps.InfoWindow({
+                          content: data.address+'<br>'+data.type
+                      });
+                      var marker=  new google.maps.Marker({
+                          position: {lat:data.latitude, lng: data.longitude},
+                          icon:image,
+                          map: map
+                      });
+                      marker.addListener('click', function() {
+                          infowindow.open(map, marker);
+                      });
+
+
+                  });
+              })
+
+          }
+
+  </script>
+    </div>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxm5Iz95-PsGkjLl7jPDIqSua4We7qO9c&callback=initMap">
+    </script>
+  </body>
+
+
+
+
+</html>
